@@ -22,6 +22,7 @@ SPEC_FILES=	Spec.Chacha20.fst \
 		Spec.GaloisField.fst \
 		Spec.GF128.fst \
 		Spec.AES.fst \
+		Spec.AES256.fst \
 		Spec.AESGCM.fst \
 		Spec.SHA2.fst \
 		Spec.SHA2.Constants.fst \
@@ -112,6 +113,20 @@ aes.exe: $(LIBS_FILES) Spec.GaloisField.fst Spec.AES.fst tests/Spec.AES.Test.fst
 	@echo 'let _ = test()' >> aes-ml/Spec_AES_Test.ml
 	$(OCAMLOPT) -I aes-ml $(OCAML_INCLUDES) $(addprefix aes-ml/, $(LIBS_ML)) aes-ml/Spec_GaloisField.ml aes-ml/Spec_AES.ml aes-ml/Spec_AES_Test.ml -o aes.exe
 	./aes.exe
+
+aes256.exe: $(LIBS_FILES) Spec.AES256.fst tests/Spec.AES256.Test.fst
+	mkdir -p aes256-ml
+	$(FSTAR) --codegen OCaml --lax $(LIBS_EX) --extract_module Spec.AES256 --extract_module Spec.AES256.Test --odir aes256-ml $^
+	@echo 'let _ = test()' >> aes256-ml/Spec_AES256_Test.ml
+	$(OCAMLOPT) -I aes256-ml $(OCAML_INCLUDES) $(addprefix aes256-ml/, $(LIBS_ML)) aes256-ml/Spec_AES256.ml aes256-ml/Spec_AES256_Test.ml -o aes256.exe
+	./aes256.exe
+
+aes256_cbc.exe: $(LIBS_FILES) Spec.AES256_CBC.fst tests/Spec.AES256_CBC.Test.fst
+	mkdir -p aes256_cbc-ml
+	$(FSTAR) --codegen OCaml --lax $(LIBS_EX) --extract_module Spec.AES256 --extract_module Spec.AES256_CBC --extract_module Spec.AES256_CBC.Test --odir aes256_cbc-ml $^
+	@echo 'let _ = test()' >> aes256_cbc-ml/Spec_AES256_CBC_Test.ml
+	$(OCAMLOPT) -I aes256_cbc-ml $(OCAML_INCLUDES) $(addprefix aes256_cbc-ml/, $(LIBS_ML)) aes256_cbc-ml/Spec_AES256.ml aes256_cbc-ml/Spec_AES256_CBC.ml aes256_cbc-ml/Spec_AES256_CBC_Test.ml -o aes256_cbc.exe
+	./aes256_cbc.exe
 
 # Under CI
 aes128gcm.exe: $(LIBS_FILES) Spec.GaloisField.fst Spec.AES.fst Spec.GF128.fst Spec.AES128_GCM.fst tests/Spec.AES128_GCM.Test.fst
