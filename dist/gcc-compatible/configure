@@ -201,7 +201,8 @@ show_help () {
   printf "                    * aarch64-apple-ios\n"
   printf "                    * x86_64-apple-ios-simulator\n"
   printf "    --disable-bzero Do not use explicit_bzero (binary will work with an old GLIBC)\n"
-  printf "    --disable-ocaml Disable OCAML bindings\n"
+  printf "    --disable-ocaml Always disable OCAML bindings\n"
+  printf "    --enable-ocaml  Always enable OCAML bindings\n"
   printf "\n"
 }
 
@@ -211,6 +212,7 @@ echo -n > Makefile.config
 echo -n > config.h
 
 # Default arguments
+enable_ocaml=0
 disable_ocaml=0
 disable_bzero=0
 cross_build=0
@@ -220,6 +222,7 @@ all_args=("$@")
 while [ $# -gt 0 ]; do
     case "$1" in
         -target) build_target="$2"; shift ;;
+        --enable-ocaml) enable_ocaml=1 ;;
         --disable-ocaml) disable_ocaml=1 ;;
         --disable-bzero) disable_bzero=1 ;;
         --help) show_help; exit 0 ;;
@@ -461,7 +464,7 @@ if ! detect_uint128; then
   echo "CFLAGS += -DKRML_VERIFIED_UINT128" >> Makefile.config
 fi
 
-if [[ "$disable_ocaml" == "1" ]] || ! detect_ocaml; then
+if [[ "$enable_ocaml" == "0" ]] || [[ "$disable_ocaml" == "1" ]] || ! detect_ocaml; then
   echo "OCaml bindings disabled"
   echo "DISABLE_OCAML_BINDINGS=1" >> Makefile.config
 fi

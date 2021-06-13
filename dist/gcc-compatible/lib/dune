@@ -1,0 +1,22 @@
+(install
+ (files ../config.h)
+ (section lib)
+ (package hacl-star-raw))
+
+(rule
+  (write-file dune.cflags "(:standard -I.. -Wno-parentheses -Wno-deprecated-declarations -Wno-#warnings -Wno-error=cpp -Wno-cpp -g -std=gnu11 -O3)"))
+
+(include dune.inc)
+
+(rule
+ (deps
+  (source_tree .))
+ (action
+  (with-stdout-to
+   dune.inc.gen
+   (run ../gen_dune_rules.exe --dir lib ../ctypes.depend))))
+
+(rule
+ (alias runtest)
+ (action
+  (diff dune.inc dune.inc.gen)))
